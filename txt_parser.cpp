@@ -177,17 +177,11 @@ double TXT_Parser::readDouble()
 double* TXT_Parser::readArray(size_t &size)
 {
   std::vector<double> buf;
-  char *s;
-  file.getline(s, 100, '\n');       // TODO: parsing numbers from string
-  cout << s << endl;
-  buf.push_back(strToDouble(s));
-
-  size = buf.size();
-  double* arr = new double[size];
-  for (size_t i = 0; i < size; i++)
-    arr[i] = buf[i];
-
-  return arr;
+  char s[MAX_CHAR_LINE];
+  file.getline(s, MAX_CHAR_LINE);
+  if (isEnd() || s == "\n")
+    throw err.sendMess("end of file!");
+  return strToArray(s, size);
 }
 
 
@@ -195,7 +189,6 @@ void TXT_Parser::newLine()
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
-
   file << '\n';
 }
 
@@ -249,6 +242,35 @@ double TXT_Parser::strToDouble(const char *s)
   }
 
   return pos_neg * val;
+}
+
+double* TXT_Parser::strToArray(const char *s, size_t &size)
+{
+  string val_str = "";
+  vector<double> buf;
+  while (true)
+  {
+    if (isalpha(*s) || isspace(*s) || !*s)
+    {
+      if (!val_str.empty())
+      {
+        buf.push_back(strToDouble(val_str));
+        val_str.clear();
+      }
+      if (!*s)
+        break;
+      s++;
+      continue;
+    }
+    val_str += *s;
+    s++;
+  }
+
+  size = buf.size();
+  double *arr = new double[size];
+  for (size_t i = 0; i < size; i++)
+    arr[i] = buf[i];
+  return arr;
 }
 
 void TXT_Parser::string_num(const char *s, string &val_str)

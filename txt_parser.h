@@ -7,6 +7,8 @@
 #include <map>
 #include <vector>
 
+#define MAX_CHAR_LINE 50
+
 class TXT_Parser
 {
 private:
@@ -61,6 +63,7 @@ public:
 
   double strToDouble(const std::string &str);
   double strToDouble(const char *s);
+  double* strToArray(const char *s, size_t &size);
   void newLine();
 
 private:
@@ -82,10 +85,9 @@ void TXT_Parser::writeArray(const T* arr, int size)
 {
   if (size < 1)
     throw err.sendMess("invalid array size! Array size must be > 0!");
-
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < size - 1; i++)
     file << arr[i] << '\t';
-  file << '\n';
+  file << arr[size - 1] << '\n';
 }
 
 template<typename T>
@@ -96,9 +98,9 @@ void TXT_Parser::writeMatrix(T** matr, int rows, int columns)
 
   for (int i = 0; i < rows; i++)
   {
-    for (int j = 0; j < columns; j++)
+    for (int j = 0; j < columns - 1; j++)
       file << matr[i][j] << '\t';
-    file << '\n';
+    file << matr[i][columns - 1] << '\n';
   }
 }
 
