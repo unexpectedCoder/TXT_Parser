@@ -2,7 +2,7 @@
 #define TXT_PARSER
 
 #include <fstream>
-#include <string>
+#include <cstring>
 #include <stack>
 #include <map>
 #include <vector>
@@ -59,11 +59,13 @@ public:
 
   const std::string& readNext();
   double readDouble();
-  double* readArray(size_t &size);
+  double* readArray(const char *line, size_t &size);
+  double** readMatrix(size_t &r, size_t &c);
 
   double strToDouble(const std::string &str);
   double strToDouble(const char *s);
   double* strToArray(const char *s, size_t &size);
+  void getLine(char *s, int size = MAX_CHAR_LINE, char split = '\n');
   void newLine();
 
 private:
@@ -87,7 +89,7 @@ void TXT_Parser::writeArray(const T* arr, int size)
     throw err.sendMess("invalid array size! Array size must be > 0!");
   for (int i = 0; i < size - 1; i++)
     file << arr[i] << '\t';
-  file << arr[size - 1] << '\n';
+  file << arr[size - 1] << "\n\n";
 }
 
 template<typename T>
@@ -102,6 +104,7 @@ void TXT_Parser::writeMatrix(T** matr, int rows, int columns)
       file << matr[i][j] << '\t';
     file << matr[i][columns - 1] << '\n';
   }
+  file << '\n';
 }
 
 #endif

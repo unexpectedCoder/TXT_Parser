@@ -174,16 +174,48 @@ double TXT_Parser::readDouble()
   return v;
 }
 
-double* TXT_Parser::readArray(size_t &size)
+double** TXT_Parser::readMatrix(size_t &r, size_t &c)
 {
-  std::vector<double> buf;
-  char s[MAX_CHAR_LINE];
-  file.getline(s, MAX_CHAR_LINE);
-  if (isEnd() || s == "\n")
-    throw err.sendMess("end of file!");
-  return strToArray(s, size);
+  vector<double*> buf;
+  char line[MAX_CHAR_LINE];
+  size_t c_buf = 0;
+  r = 0; c = 0;
+
+  while (true)
+  {
+    if (c != c_buf)
+      throw err.sendMess("invalid matrix in file! Number of columns doesn't match in rows!");
+
+    getLine(line, MAX_CHAR_LINE);
+    if (isEnd() || strcmp(line, "") == 0) break;
+    double *arr = readArray(line, c);
+    c_buf = c;
+    buf.push_back(arr);
+  }
+
+  r = buf.size();
+  if (r < 1 || c < 1)
+    throw err.sendMess("invalid matrix size! Number of rows or columns < 1!");
+
+  double **matr = new double*[r];
+  for (size_t i = 0; i < r; i++)
+    *(matr + i) = buf[i];
+  return matr;
 }
 
+double* TXT_Parser::readArray(const char *line, size_t &size)
+{
+  vector<double> buf;
+  if (isEnd())
+    throw err.sendMess("end of file!");
+  return strToArray(line, size);
+}
+
+
+void TXT_Parser::getLine(char *s, int size, char split)
+{
+  file.getline(s, size, split);
+}
 
 void TXT_Parser::newLine()
 {

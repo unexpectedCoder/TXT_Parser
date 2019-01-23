@@ -22,18 +22,15 @@ int main()
     par.close();
 
     par.open("1.txt", 'r');
-    size_t size;
-    double *arr = par.readArray(size);
-    cout << "#1" << endl;
-    for (size_t i = 0; i < size; i++)
-      cout << arr[i] << '\t';
-    cout << endl;
-
-    arr = par.readArray(size);
-    cout << "#2" << endl;
-    for (size_t i = 0; i < size; i++)
-      cout << arr[i] << '\t';
-    cout << endl;
+    size_t r, c;
+    double **m = par.readMatrix(r, c);
+    cout << "rows = " << r << ", columns = " << c << endl;
+    for (size_t i = 0; i < r; i++)
+    {
+      for (size_t j = 0; j < c; j++)
+        cout << m[i][j] << '\t';
+      cout << endl;
+    }
     par.close();
   }
   catch (const string &ex)
