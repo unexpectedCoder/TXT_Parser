@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include "txt_parser.h"
-using namespace std;
 
+using namespace std;
 
 void TXT_Parser::Error::formError(const string &err_txt)
 {
@@ -35,6 +35,16 @@ TXT_Parser::TXT_Parser()
            {'7', 7},
            {'8', 8},
            {'9', 9}};
+}
+
+TXT_Parser::~TXT_Parser()
+{
+  curr_str.clear();
+  curr_str.~basic_string();
+  delete [] arr;
+  for (size_t i = 0; i < rows; i++)
+    delete [] matr[i];
+  delete [] matr;
 }
 
 TXT_Parser::TXT_Parser(const string &path, char mode)
@@ -196,24 +206,25 @@ double** TXT_Parser::readMatrix(size_t &r, size_t &c)
   r = buf.size();
   if (r < 1 || c < 1)
     throw err.sendMess("invalid matrix size! Number of rows or columns < 1!");
-
-  double **matr = new double*[r];
+  matr = new double*[r];
   for (size_t i = 0; i < r; i++)
-    *(matr + i) = buf[i];
+    matr[i] = buf[i];
   return matr;
 }
 
 double* TXT_Parser::readArray(const char *line, size_t &size)
 {
+  if (isEnd() || !isOpen())
+    throw err.sendMess("end of file or file is not opened!");
   vector<double> buf;
-  if (isEnd())
-    throw err.sendMess("end of file!");
   return strToArray(line, size);
 }
 
 
 void TXT_Parser::getLine(char *s, int size, char split)
 {
+  if (isEnd() || !isOpen())
+    throw err.sendMess("end of file or file is not opened!");
   file.getline(s, size, split);
 }
 
@@ -299,7 +310,7 @@ double* TXT_Parser::strToArray(const char *s, size_t &size)
   }
 
   size = buf.size();
-  double *arr = new double[size];
+  arr = new double[size];
   for (size_t i = 0; i < size; i++)
     arr[i] = buf[i];
   return arr;

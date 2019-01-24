@@ -32,11 +32,8 @@ private:
 
 public:
   TXT_Parser();
-    TXT_Parser(const std::string &path, char mode);
-  ~TXT_Parser() {
-    curr_str.clear();
-    curr_str.~basic_string();
-  }
+  TXT_Parser(const std::string &path, char mode);
+  ~TXT_Parser();
 
   void createFileTXT(const std::string &path);
   void open(const std::string &path, char mode);
@@ -79,30 +76,32 @@ private:
   Error err;
   std::string curr_str;
   std::map<char, int> digit;
+  double *arr, **matr;
+  size_t rows;
 };
 
 
 template<typename T>
-void TXT_Parser::writeArray(const T* arr, int size)
+void TXT_Parser::writeArray(const T* arr, int n)
 {
-  if (size < 1)
+  if (n < 1)
     throw err.sendMess("invalid array size! Array size must be > 0!");
-  for (int i = 0; i < size - 1; i++)
+  for (int i = 0; i < n - 1; i++)
     file << arr[i] << '\t';
-  file << arr[size - 1] << "\n\n";
+  file << arr[n - 1] << "\n\n";
 }
 
 template<typename T>
-void TXT_Parser::writeMatrix(T** matr, int rows, int columns)
+void TXT_Parser::writeMatrix(T** m, int r, int c)
 {
-  if (rows < 1 || columns < 1)
+  if (r < 1 || c < 1)
     throw err.sendMess("invalid matrix size! Number of rows and columns must be > 0!");
 
-  for (int i = 0; i < rows; i++)
+  for (int i = 0; i < r; i++)
   {
-    for (int j = 0; j < columns - 1; j++)
-      file << matr[i][j] << '\t';
-    file << matr[i][columns - 1] << '\n';
+    for (int j = 0; j < c - 1; j++)
+      file << m[i][j] << '\t';
+    file << m[i][c - 1] << '\n';
   }
   file << '\n';
 }
