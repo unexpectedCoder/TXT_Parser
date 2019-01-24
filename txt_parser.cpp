@@ -37,20 +37,10 @@ TXT_Parser::TXT_Parser()
            {'9', 9}};
 }
 
-TXT_Parser::~TXT_Parser()
-{
-  curr_str.clear();
-  curr_str.~basic_string();
-  delete [] arr;
-  for (size_t i = 0; i < rows; i++)
-    delete [] matr[i];
-  delete [] matr;
-}
-
 TXT_Parser::TXT_Parser(const string &path, char mode)
 {
   curr_str = "...eof...\n";
-    open(path, mode);
+  open(path, mode);
   digit = {{'0', 0},
            {'1', 1},
            {'2', 2},
@@ -62,6 +52,17 @@ TXT_Parser::TXT_Parser(const string &path, char mode)
            {'8', 8},
            {'9', 9}};
 }
+
+TXT_Parser::~TXT_Parser()
+{
+  curr_str.clear();
+  curr_str.~basic_string();
+  delete [] arr;
+  for (size_t i = 0; i < rows; i++)
+    delete [] matr[i];
+  delete [] matr;
+}
+
 
 void TXT_Parser::open(const string &path, char mode)
 {
@@ -89,7 +90,7 @@ void TXT_Parser::open(const string &path, char mode)
 
 bool TXT_Parser::isExisting(const string &path) const
 {
-    fstream f(path.c_str(), ios_base::in);
+    fstream f(path.c_str());
     if (f.is_open())
         return true;
     return false;
@@ -118,7 +119,7 @@ bool TXT_Parser::isEnd() const
 
 void TXT_Parser::createFileTXT(const string &path)
 {
-    ofstream f{ path.c_str() };
+  ofstream f{ path.c_str() };
 }
 
 void TXT_Parser::write(const string &text)

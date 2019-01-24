@@ -12,30 +12,29 @@
 class TXT_Parser
 {
 private:
-    class Error
-    {
-    private:
-        std::string error;
-        std::stack<std::string> errors;
-    public:
-        Error() : error("No errors.\n") {}
-        ~Error() {
-            error.clear();
-        }
-
-    const std::string& sendMess(const std::string &err_txt);
-        const std::stack<std::string>& getErrors() const;
+  class Error
+  {
+  private:
+    std::string error;
+    std::stack<std::string> errors;
+  public:
+    Error() : error("No errors.\n") {}
+    ~Error() {
+      error.clear();
+    }
+  const std::string& sendMess(const std::string &err_txt);
+  const std::stack<std::string>& getErrors() const;
 
   private:
     void formError(const std::string &err_txt);
-    };
+  };
 
 public:
   TXT_Parser();
   TXT_Parser(const std::string &path, char mode);
   ~TXT_Parser();
 
-  void createFileTXT(const std::string &path);
+  static void createFileTXT(const std::string &path);
   void open(const std::string &path, char mode);
   void close();
 
