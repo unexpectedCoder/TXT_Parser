@@ -17,6 +17,7 @@ int main()
         matr[i][j] = i * j + i * i + j - 1;
     }
 
+    TXT_Parser::createFileTXT("1.txt");
     TXT_Parser par("1.txt", 'w');
     par.writeMatrix<double>(matr, 2, 3);
     par.close();
@@ -38,5 +39,6 @@ int main()
     cout << ex << endl;
   }
 
+  cout << "Program successfully completed...\n";
   return 0;
 }

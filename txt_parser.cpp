@@ -1,24 +1,24 @@
 #include <stdlib.h>
-#include <iostream>
 #include "txt_parser.h"
 
 using namespace std;
 
+
 void TXT_Parser::Error::formError(const string &err_txt)
 {
-    error = "ERROR: " + err_txt + "\n";
-    errors.push(error);
+  error = "ERROR: " + err_txt + "\n";
+  errors.push(error);
 }
 
 const string& TXT_Parser::Error::sendMess(const string &err_txt)
 {
   formError(err_txt);
-    return error;
+  return error;
 }
 
 const stack<string>& TXT_Parser::Error::getErrors() const
 {
-    return errors;
+  return errors;
 }
 
 
@@ -127,7 +127,7 @@ void TXT_Parser::write(const string &text)
   if (!isOpen())
     throw err.sendMess("file is not opened!");
   if (!text.empty())
-    file << text;
+    file << text.c_str();
 }
 
 void TXT_Parser::write(double v)
@@ -148,21 +148,21 @@ void TXT_Parser::write(double v, const string &text)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
-  file << v << text;
+  file << v << text.c_str();
 }
 
 void TXT_Parser::write(const string &text, double v, char split)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
-  file << text << v << split;
+  file << text.c_str() << v << split;
 }
 
 void TXT_Parser::write(const string &pre_text, double v, const string &post_text)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
-  file << pre_text << v << post_text;
+  file << pre_text.c_str() << v << post_text.c_str();
 }
 
 const string& TXT_Parser::readNext()
@@ -170,8 +170,11 @@ const string& TXT_Parser::readNext()
   if (!isOpen())
     throw err.sendMess("file is not opened!");
 
+  char *str;
   if (!file.eof())
-    file >> curr_str;
+    file >> str;
+  curr_str = str;
+  delete [] str;
   return curr_str;
 }
 
