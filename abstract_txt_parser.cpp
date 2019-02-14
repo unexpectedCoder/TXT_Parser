@@ -1,28 +1,28 @@
 #include <stdlib.h>
-#include "txt_parser.h"
+#include "abstract_txt_parser.h"
 
 using namespace std;
 
 
-void TXT_Parser::Error::formError(const string &err_txt)
+void AbstractTXTParser::Error::formError(const string &err_txt)
 {
   error = "ERROR: " + err_txt + "\n";
   errors.push(error);
 }
 
-const string& TXT_Parser::Error::sendMess(const string &err_txt)
+const string& AbstractTXTParser::Error::sendMess(const string &err_txt)
 {
   formError(err_txt);
   return error;
 }
 
-const stack<string>& TXT_Parser::Error::getErrors() const
+const stack<string>& AbstractTXTParser::Error::getErrors() const
 {
   return errors;
 }
 
 
-TXT_Parser::TXT_Parser()
+AbstractTXTParser::AbstractTXTParser()
 {
   curr_str = "...eof...\n";
   digit = {{'0', 0},
@@ -37,7 +37,7 @@ TXT_Parser::TXT_Parser()
            {'9', 9}};
 }
 
-TXT_Parser::TXT_Parser(const string &path, char mode)
+AbstractTXTParser::AbstractTXTParser(const string &path, char mode)
 {
   curr_str = "...eof...\n";
   open(path, mode);
@@ -53,63 +53,62 @@ TXT_Parser::TXT_Parser(const string &path, char mode)
            {'9', 9}};
 }
 
-TXT_Parser::~TXT_Parser()
+AbstractTXTParser::~AbstractTXTParser()
 {
   curr_str.clear();
   curr_str.~basic_string();
   delete [] arr;
-  for (size_t i = 0; i < rows; i++)
+  for (int i = 0; i < rows; i++)
     delete [] matr[i];
   delete [] matr;
 }
 
-
-void TXT_Parser::open(const string &path, char mode)
+void AbstractTXTParser::open(const string &path, char mode)
 {
   if (!isExisting(path))
     throw err.sendMess("file is not found or existing!");
   if (!checkMode(mode))
     throw err.sendMess("unknown file opening mode!");
 
-    if (mode == 'w')
-    {
-        file.open(path, ios_base::out);
-        return;
-    }
-    if (mode == 'r')
-    {
-        file.open(path, ios_base::in);
-        return;
-    }
-    if (mode == 'a')
-    {
-        file.open(path, ios_base::app);
-        return;
-    }
+  if (mode == 'w')
+  {
+    file.open(path, ios_base::out);
+    return;
+  }
+  if (mode == 'r')
+  {
+    file.open(path, ios_base::in);
+    return;
+  }
+  if (mode == 'a')
+  {
+    file.open(path, ios_base::app);
+    return;
+  }
 }
 
-bool TXT_Parser::isExisting(const string &path) const
+bool AbstractTXTParser::isExisting(const string &path) const
 {
-    fstream f(path.c_str());
-    if (f.is_open())
-        return true;
-    return false;
+  fstream f(path.c_str());
+  if (f.is_open())
+    return true;
+  return false;
 }
 
-void TXT_Parser::close()
+void AbstractTXTParser::close()
 {
-    if (isOpen())
-        file.close();
+  if (isOpen())
+    file.close();
 }
 
-bool TXT_Parser::isOpen() const
+bool AbstractTXTParser::isOpen() const
 {
-    if (file.is_open())
-        return true;
-    return false;
+  if (file.is_open())
+    return true;
+  return false;
 }
 
-bool TXT_Parser::isEnd() const
+bool AbstractTXTParser::isEnd() const
 {
   if (file.eof())
     return true;
@@ -117,12 +116,12 @@ bool TXT_Parser::isEnd() const
 }
 
 
-void TXT_Parser::createFileTXT(const string &path)
+void AbstractTXTParser::createFileTXT(const string &path)
 {
   ofstream f{ path.c_str() };
 }
 
-void TXT_Parser::write(const string &text)
+void AbstractTXTParser::write(const string &text)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
@@ -130,42 +129,42 @@ void TXT_Parser::write(const string &text)
     file << text.c_str();
 }
 
-void TXT_Parser::write(double v)
+void AbstractTXTParser::write(double v)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
   file << v;
 }
 
-void TXT_Parser::write(double v, char split)
+void AbstractTXTParser::write(double v, char split)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
   file << v << split;
 }
 
-void TXT_Parser::write(double v, const string &text)
+void AbstractTXTParser::write(double v, const string &text)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
   file << v << text.c_str();
 }
 
-void TXT_Parser::write(const string &text, double v, char split)
+void AbstractTXTParser::write(const string &text, double v, char split)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
   file << text.c_str() << v << split;
 }
 
-void TXT_Parser::write(const string &pre_text, double v, const string &post_text)
+void AbstractTXTParser::write(const string &pre_text, double v, const string &post_text)
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
   file << pre_text.c_str() << v << post_text.c_str();
 }
 
-const string& TXT_Parser::readNext()
+const string& AbstractTXTParser::readNext()
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
@@ -178,7 +177,7 @@ const string& TXT_Parser::readNext()
   return curr_str;
 }
 
-double TXT_Parser::readDouble()
+double AbstractTXTParser::readDouble()
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
@@ -188,11 +187,11 @@ double TXT_Parser::readDouble()
   return v;
 }
 
-double** TXT_Parser::readMatrix(size_t &r, size_t &c)
+double** AbstractTXTParser::readMatrix(int &r, int &c)
 {
   vector<double*> buf;
   char line[MAX_CHAR_LINE];
-  size_t c_buf = 0;
+  int c_buf = 0;
   r = 0; c = 0;
 
   while (true)
@@ -211,12 +210,12 @@ double** TXT_Parser::readMatrix(size_t &r, size_t &c)
   if (r < 1 || c < 1)
     throw err.sendMess("invalid matrix size! Number of rows or columns < 1!");
   matr = new double*[r];
-  for (size_t i = 0; i < r; i++)
+  for (int i = 0; i < r; i++)
     matr[i] = buf[i];
   return matr;
 }
 
-double* TXT_Parser::readArray(const char *line, size_t &size)
+double* AbstractTXTParser::readArray(const char *line, int &size)
 {
   if (isEnd() || !isOpen())
     throw err.sendMess("end of file or file is not opened!");
@@ -225,14 +224,14 @@ double* TXT_Parser::readArray(const char *line, size_t &size)
 }
 
 
-void TXT_Parser::getLine(char *s, int size, char split)
+void AbstractTXTParser::getLine(char *s, int size, char split)
 {
   if (isEnd() || !isOpen())
     throw err.sendMess("end of file or file is not opened!");
   file.getline(s, size, split);
 }
 
-void TXT_Parser::newLine()
+void AbstractTXTParser::newLine()
 {
   if (!isOpen())
     throw err.sendMess("file is not opened!");
@@ -240,26 +239,26 @@ void TXT_Parser::newLine()
 }
 
 
-bool TXT_Parser::checkMode(char mode)
+bool AbstractTXTParser::checkMode(char mode)
 {
   if (mode == 'w' || mode == 'r' || mode == 'a')
     return true;
   return false;
 }
 
-double TXT_Parser::strToDouble(const string &str)
+double AbstractTXTParser::strToDouble(const string &str)
 {
   const char* s = str.c_str();
   return strToDouble(s);
 }
 
-double TXT_Parser::strToDouble(const char *s)
+double AbstractTXTParser::strToDouble(const char *s)
 {
   string val_str;
   string_num(s, val_str);
 
   double val = 0;
-  size_t i;
+  int i;
   int pos_neg = 1;
   if (val_str[0] == '-')
     pos_neg = -1;
@@ -291,7 +290,7 @@ double TXT_Parser::strToDouble(const char *s)
   return pos_neg * val;
 }
 
-double* TXT_Parser::strToArray(const char *s, size_t &size)
+double* AbstractTXTParser::strToArray(const char *s, int &size)
 {
   string val_str = "";
   vector<double> buf;
@@ -315,12 +314,12 @@ double* TXT_Parser::strToArray(const char *s, size_t &size)
 
   size = buf.size();
   arr = new double[size];
-  for (size_t i = 0; i < size; i++)
+  for (int i = 0; i < size; i++)
     arr[i] = buf[i];
   return arr;
 }
 
-void TXT_Parser::string_num(const char *s, string &val_str)
+void AbstractTXTParser::string_num(const char *s, string &val_str)
 {
   val_str = "";
   while (*s != '\0')
@@ -343,12 +342,12 @@ void TXT_Parser::string_num(const char *s, string &val_str)
   }
 }
 
-void TXT_Parser::integer(double &v, int k, int a)
+void AbstractTXTParser::integer(double &v, int k, int a)
 {
   v = k * v + a;
 }
 
-void TXT_Parser::fraction(double &v, double k, int a)
+void AbstractTXTParser::fraction(double &v, double k, int a)
 {
   v = v + k * a;
 }

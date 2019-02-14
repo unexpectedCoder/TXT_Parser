@@ -9,9 +9,9 @@
 
 #define MAX_CHAR_LINE 50
 
-class TXT_Parser
+class AbstractTXTParser
 {
-private:
+protected:
   class Error
   {
   private:
@@ -30,9 +30,9 @@ private:
   };
 
 public:
-  TXT_Parser();
-  TXT_Parser(const std::string &path, char mode);
-  ~TXT_Parser();
+  AbstractTXTParser();
+  AbstractTXTParser(const std::string &path, char mode);
+  ~AbstractTXTParser();
 
   static void createFileTXT(const std::string &path);
   void open(const std::string &path, char mode);
@@ -55,33 +55,33 @@ public:
 
   const std::string& readNext();
   double readDouble();
-  double* readArray(const char *line, size_t &size);
-  double** readMatrix(size_t &r, size_t &c);
+  double* readArray(const char *line, int &size);
+  double** readMatrix(int &r, int &c);
 
   double strToDouble(const std::string &str);
   double strToDouble(const char *s);
-  double* strToArray(const char *s, size_t &size);
+  double* strToArray(const char *s, int &size);
   void getLine(char *s, int size = MAX_CHAR_LINE, char split = '\n');
   void newLine();
 
-private:
+protected:
   bool checkMode(char mode);
   void string_num(const char *s, std::string &str);
   void integer(double &v, int k, int a);
   void fraction(double &v, double k, int a);
 
-private:
+protected:
   std::fstream file;
   Error err;
   std::string curr_str;
   std::map<char, int> digit;
   double *arr, **matr;
-  size_t rows;
+  int rows;
 };
 
 
 template<typename T>
-void TXT_Parser::writeArray(const T* arr, int n)
+void AbstractTXTParser::writeArray(const T* arr, int n)
 {
   if (n < 1)
     throw err.sendMess("invalid array size! Array size must be > 0!");
@@ -91,7 +91,7 @@ void TXT_Parser::writeArray(const T* arr, int n)
 }
 
 template<typename T>
-void TXT_Parser::writeMatrix(T** m, int r, int c)
+void AbstractTXTParser::writeMatrix(T** m, int r, int c)
 {
   if (r < 1 || c < 1)
     throw err.sendMess("invalid matrix size! Number of rows and columns must be > 0!");

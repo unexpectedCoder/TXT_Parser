@@ -7,7 +7,7 @@ CONFIG -= qt
 
 SOURCES += \
         main.cpp \
-    txt_parser.cpp
+    abstract_txt_parser.cpp
 
 HEADERS += \
-    txt_parser.h
+    abstract_txt_parser.h

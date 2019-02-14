@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "txt_parser.h"
+#include "abstract_txt_parser.h"
 
 using namespace std;
 
@@ -17,18 +17,18 @@ int main()
         matr[i][j] = i * j + i * i + j - 1;
     }
 
-    TXT_Parser::createFileTXT("1.txt");
-    TXT_Parser par("1.txt", 'w');
+    AbstractTXTParser::createFileTXT("1.txt");
+    AbstractTXTParser par("1.txt", 'w');
     par.writeMatrix<double>(matr, 2, 3);
     par.close();
 
     par.open("1.txt", 'r');
-    size_t r, c;
+    int r, c;
     double **m = par.readMatrix(r, c);
     cout << "rows = " << r << ", columns = " << c << endl;
-    for (size_t i = 0; i < r; i++)
+    for (int i = 0; i < r; i++)
     {
-      for (size_t j = 0; j < c; j++)
+      for (int j = 0; j < c; j++)
         cout << m[i][j] << '\t';
       cout << endl;
     }
